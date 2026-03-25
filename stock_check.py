@@ -13,10 +13,11 @@ def send_line(msg):
     requests.post(url, headers=headers, data={"message": msg})
 
 def get_stock():
-    url = f"https://ec.elifemall.com.tw/api/products/{PRODUCT_ID}"
+    url = f"https://ec.elifemall.com.tw/api/product/{PRODUCT_ID}"
 
     headers = {
         "User-Agent": "Mozilla/5.0",
+        "Referer": "https://ec.elifemall.com.tw/",
         "Accept": "application/json"
     }
 
@@ -24,16 +25,10 @@ def get_stock():
         res = requests.get(url, headers=headers, timeout=5, verify=False)
         data = res.json()
 
-        print("回傳資料:", data)  # 🔥 先看結構
+        print("回傳資料:", data)
 
-        # ✅ 嘗試兩種格式（最穩）
-        if "stock" in data:
-            stock = data["stock"]
-        elif "data" in data and "stock" in data["data"]:
-            stock = data["data"]["stock"]
-        else:
-            print("⚠️ 找不到 stock 欄位")
-            return None
+        # 🔥 關鍵在這裡（你提供的結構）
+        stock = data[0]["stock"]
 
         print("目前庫存:", stock)
 
