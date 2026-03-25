@@ -1,5 +1,8 @@
 import requests
 import time
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 PRODUCT_ID = "2154913"
 LINE_TOKEN = "RbmXo1ELaaNY4g6+rIdyKoDZvp/jD6ZhpDjZIMJ76W9QPcjZs3di6pGym/Yq7EyFnPIczCeYANv3BnaNYuBetTLaqj/EbMC5FikxR0k59VdnYBfHE9GIcQwAbWqI9MuIRRbxfQgE7WO9ChCKoNhZ+wdB04t89/1O/w1cDnyilFU="
@@ -10,7 +13,6 @@ def send_line(msg):
     requests.post(url, headers=headers, data={"message": msg})
 
 def get_stock():
-
     url = f"https://ec.elifemall.com.tw/api/products/{PRODUCT_ID}"
 
     headers = {
@@ -19,11 +21,10 @@ def get_stock():
     }
 
     try:
-        res = requests.get(url, headers=headers, timeout=5)
+        res = requests.get(url, headers=headers, timeout=5, verify=False)
         data = res.json()
 
         stock = data["data"]["stock"]
-
         print("目前庫存:", stock)
 
         return stock > 0
