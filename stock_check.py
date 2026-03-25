@@ -24,7 +24,17 @@ def get_stock():
         res = requests.get(url, headers=headers, timeout=5, verify=False)
         data = res.json()
 
-        stock = data["data"]["stock"]
+        print("回傳資料:", data)  # 🔥 先看結構
+
+        # ✅ 嘗試兩種格式（最穩）
+        if "stock" in data:
+            stock = data["stock"]
+        elif "data" in data and "stock" in data["data"]:
+            stock = data["data"]["stock"]
+        else:
+            print("⚠️ 找不到 stock 欄位")
+            return None
+
         print("目前庫存:", stock)
 
         return stock > 0
