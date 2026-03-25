@@ -1,47 +1,49 @@
-import time
 import requests
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+import time
 
-URL = "https://ec.elifemall.com.tw/products/2154913"
+PRODUCT_ID = "2154913"
 LINE_TOKEN = "RbmXo1ELaaNY4g6+rIdyKoDZvp/jD6ZhpDjZIMJ76W9QPcjZs3di6pGym/Yq7EyFnPIczCeYANv3BnaNYuBetTLaqj/EbMC5FikxR0k59VdnYBfHE9GIcQwAbWqI9MuIRRbxfQgE7WO9ChCKoNhZ+wdB04t89/1O/w1cDnyilFU="
 
 def send_line(msg):
     url = "https://notify-api.line.me/api/notify"
     headers = {"Authorization": f"Bearer {LINE_TOKEN}"}
-    data = {"message": msg}
-    requests.post(url, headers=headers, data=data)
+    requests.post(url, headers=headers, data={"message": msg})
 
-def check_stock():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+def get_stock():
 
-    driver = webdriver.Chrome(options=options)
+    url = f"https://ec.elifemall.com.tw/api/products/{PRODUCT_ID}"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
+    }
 
     try:
-        driver.get(URL)
-        time.sleep(5)
+        res = requests.get(url, headers=headers, timeout=5)
+        data = res.json()
 
-        page_text = driver.page_source
+        stock = data["data"]["stock"]
 
-        if "加入購物車" in page_text and "補貨中" not in page_text:
-            return True
+        print("目前庫存:", stock)
 
-        return False
+        return stock > 0
 
-    finally:
-        driver.quit()
+    except Exception as e:
+        print("錯誤:", e)
+        return None
 
 
 while True:
-    print("🔍 檢查中...")
+    print("檢查中...")
 
-    if check_stock():
+    result = get_stock()
+
+    if result is True:
         print("✅ 有貨")
-        send_line("🎉 有貨了！\n" + URL)
-    else:
+        send_line("🎉 有貨了！")
+    elif result is False:
         print("❌ 沒貨")
+    else:
+        print("⚠️ 取得失敗")
 
     time.sleep(300)
