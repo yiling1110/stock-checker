@@ -28,7 +28,7 @@ def get_stock():
         print("回傳資料:", data)
 
         # 🔥 關鍵在這裡（你提供的結構）
-        stock = data[0]["stock"]
+        stock = data["data"]["stock"]
 
         print("目前庫存:", stock)
 
